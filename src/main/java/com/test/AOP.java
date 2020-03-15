@@ -24,7 +24,8 @@ public class AOP {
     protected void myPointcut() {
     }
 
-    @Around("execution(* com.test.BoobleManager.doit (..))")
+    @Around("execution(* com.test.BoobleManager.doit (..)) || " +
+            "execution(* com.test.DataDAOImpl.* (..))")
     public void logBefore(ProceedingJoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
 
@@ -60,8 +61,10 @@ public class AOP {
                 ParameterDTO param = new ParameterDTO(c.getName(), json, i);
                 parameList.add(param);
             }
-            CallDTO callData = new CallDTO("", "", parameList);
-
+            String className = joinPoint.getSourceLocation().getWithinType().getName();
+            String methodName = "";
+            CallDTO callData = new CallDTO(className, methodName, parameList);
+            callData = null;
 
         } catch (Throwable throwable) {
             throwable.printStackTrace();
