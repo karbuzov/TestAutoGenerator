@@ -1,12 +1,15 @@
 package com.test;
 
-import org.aspectj.lang.JoinPoint;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.test.dto.CallDTO;
+import com.test.dto.ParameterDTO;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 @Aspect
@@ -21,17 +24,49 @@ public class AOP {
     protected void myPointcut() {
     }
 
-    @Around("execution(* com.test.BoobleManager.getPage(..))")
+    @Around("execution(* com.test.BoobleManager.doit (..))")
     public void logBefore(ProceedingJoinPoint joinPoint) {
+        Object[] args = joinPoint.getArgs();
 
-        System.out.println("****@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@****");
-        System.out.println("****@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@****");
-        System.out.println("****@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@****");
-        System.out.println("****@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@****");
-        System.out.println("****@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@****");
+        ObjectMapper objectMapper = new ObjectMapper();
 
-        System.out.println("logBefore() is running!");
-        System.out.println("hijacked : " + joinPoint.getSignature().getName());
-        System.out.println("******");
+        System.out.println("****" + args + "****");
+        int i = 0;
+        List<ParameterDTO> parameList = new ArrayList<>();
+        try {
+            if (args != null && args.length > 0) {
+                for (Object obj : args) {
+                    Class c = obj.getClass();
+                    System.out.println("******" + obj);
+                    String json = objectMapper.writeValueAsString(obj);
+                    System.out.println("===========" + json);
+
+                    ParameterDTO param = new ParameterDTO(c.getName(), json, i);
+                    parameList.add(param);
+                    i++;
+                }
+            }
+
+
+            System.out.println("logBefore() is running!");
+            System.out.println("hijacked : " + joinPoint.getSignature().getName());
+            System.out.println("hijacked : " + joinPoint);
+            System.out.println("******");
+            Object obj = joinPoint.proceed();
+
+            if (obj != null) {
+                Class c = obj.getClass();
+                String json = objectMapper.writeValueAsString(obj);
+                ParameterDTO param = new ParameterDTO(c.getName(), json, i);
+                parameList.add(param);
+            }
+            CallDTO callData = new CallDTO("", "", parameList);
+
+
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+        System.out.println("hijacked : " + joinPoint);
+
     }
 }

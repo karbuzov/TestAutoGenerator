@@ -1,11 +1,10 @@
 package com.test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,9 +35,9 @@ public class BoobleManager {
         return result.toString() + "=======================";
     }
 
-    @RequestMapping("/do")
-    public void doit(){
-        getPage(1);
+    @RequestMapping("/do/{param}")
+    public void doit(@PathVariable("param") final int param){
+        getPage(param);
     }
 
 }
