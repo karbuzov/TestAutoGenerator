@@ -1,5 +1,6 @@
 package com.test;
 
+import com.test.dto.ExampleParameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,12 +27,10 @@ public class BoobleManager {
         List<String> result = new ArrayList<>();
 //        arr.subList((pageNumber-1) * pageSize, pageNumber * pageSize)
         System.out.println( "============ok");
-        System.out.println( "============ok");
-        System.out.println( "============ok");
-        System.out.println( "============ok");
-        System.out.println( "============ok");
 //        return result.stream().map(i -> i).collect();
-        result.add(dataDAO.getData(pageNumber, 123L));
+        List<ExampleParameter> lst = new ArrayList<>();
+        lst.add(new ExampleParameter("param" + pageNumber, pageNumber));
+        result.add(dataDAO.getData(null, 123L, "3d_param"));
         return result.toString() + "=======================";
     }
 

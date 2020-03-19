@@ -22,4 +22,13 @@ public class ParameterDTO {
     public int getIndex() {
         return index;
     }
+
+    @Override
+    public String toString() {
+        return "ParameterDTO{" +
+                "className='" + className + '\'' +
+                ", jsonData='" + jsonData + '\'' +
+                ", index=" + index +
+                '}';
+    }
 }

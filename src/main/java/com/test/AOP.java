@@ -31,45 +31,64 @@ public class AOP {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        System.out.println("****" + args + "****");
+//        System.out.println("****" + args + "****");
         int i = 0;
         List<ParameterDTO> parameList = new ArrayList<>();
         try {
             if (args != null && args.length > 0) {
                 for (Object obj : args) {
-                    Class c = obj.getClass();
-                    System.out.println("******" + obj);
-                    String json = objectMapper.writeValueAsString(obj);
-                    System.out.println("===========" + json);
+                    ParameterDTO param;
+                    if (obj != null) {
+                        Class c = obj.getClass();
+                        String json = objectMapper.writeValueAsString(obj);
 
-                    ParameterDTO param = new ParameterDTO(c.getName(), json, i);
+                        param = new ParameterDTO(c.getName(), json, i);
+                    } else {
+                        param = new ParameterDTO(null, null, i);
+                    }
                     parameList.add(param);
                     i++;
                 }
             }
 
-
-            System.out.println("logBefore() is running!");
-            System.out.println("hijacked : " + joinPoint.getSignature().getName());
-            System.out.println("hijacked : " + joinPoint);
-            System.out.println("******");
             Object obj = joinPoint.proceed();
 
+            ParameterDTO result = null;
             if (obj != null) {
                 Class c = obj.getClass();
                 String json = objectMapper.writeValueAsString(obj);
-                ParameterDTO param = new ParameterDTO(c.getName(), json, i);
-                parameList.add(param);
+                result = new ParameterDTO(c.getName(), json, i);
             }
             String className = joinPoint.getSourceLocation().getWithinType().getName();
             String methodName = "";
-            CallDTO callData = new CallDTO(className, methodName, parameList);
-            callData = null;
+            CallDTO callData = new CallDTO(className, methodName, parameList, result);
+            generateTest(callData);
 
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
         System.out.println("hijacked : " + joinPoint);
 
+    }
+
+    public void generateTest(CallDTO callData) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        if (callData.getParams() != null) {
+            String call = "methodname(";
+            boolean coma = false;
+            for (ParameterDTO param : callData.getParams()) {
+                Object val = null;
+                if (param.getClassName() != null) {
+                    val = objectMapper.readValue(param.getJsonData(), Class.forName(param.getClassName()));
+                }
+
+                call += coma ? ", " + val : val;
+                coma = true;
+            }
+            System.out.println(">>>>>>>>>>>>>>>" + call + ");");
+
+        }
+
+//        System.out.println(">>>>>>>>>>>>>>>" + callData);
     }
 }

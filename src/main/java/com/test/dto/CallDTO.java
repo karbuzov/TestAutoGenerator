@@ -5,13 +5,15 @@ import java.util.List;
 
 public class CallDTO {
     private List<ParameterDTO> params = new ArrayList<>();
+    private ParameterDTO result = null;
     private String className;
     private String methodName;
 
-    public CallDTO(String className, String methodName, List<ParameterDTO> params) {
+    public CallDTO(String className, String methodName, List<ParameterDTO> params, ParameterDTO result) {
         this.params = params;
         this.className = className;
         this.methodName = methodName;
+        this.result = result;
     }
 
     public List<ParameterDTO> getParams() {
@@ -36,5 +38,23 @@ public class CallDTO {
 
     public void setMethodName(String methodName) {
         this.methodName = methodName;
+    }
+
+    public ParameterDTO getResult() {
+        return result;
+    }
+
+    public void setResult(ParameterDTO result) {
+        this.result = result;
+    }
+
+    @Override
+    public String toString() {
+        return "CallDTO{" +
+                "params=" + params +
+                ", className='" + className + '\'' +
+                ", methodName='" + methodName + '\'' +
+                ", result='" + result + '\'' +
+                '}';
     }
 }
