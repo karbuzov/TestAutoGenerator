@@ -1,12 +1,15 @@
 package com.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.test.utils.ClassUtils;
 import com.test.dto.CallDTO;
 import com.test.dto.ParameterDTO;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +18,9 @@ import java.util.List;
 @Aspect
 public class AOP {
 
-    public AOP() {
+    ObjectMapper objectMapper = new ObjectMapper();
 
+    public AOP() {
         System.out.println("****  AOP ***");
     }
 
@@ -24,12 +28,10 @@ public class AOP {
     protected void myPointcut() {
     }
 
-    @Around("execution(* com.test.BoobleManager.doit (..)) || " +
+    @Around("execution(* com.test.BoobleManager.getPage (..)) || " +
             "execution(* com.test.DataDAOImpl.* (..))")
     public void logBefore(ProceedingJoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
-
-        ObjectMapper objectMapper = new ObjectMapper();
 
 //        System.out.println("****" + args + "****");
         int i = 0;
@@ -60,35 +62,74 @@ public class AOP {
                 result = new ParameterDTO(c.getName(), json, i);
             }
             String className = joinPoint.getSourceLocation().getWithinType().getName();
-            String methodName = "";
+            MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+            String methodName = signature.getMethod().getName();
             CallDTO callData = new CallDTO(className, methodName, parameList, result);
             generateTest(callData);
 
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
-        System.out.println("hijacked : " + joinPoint);
+    }
 
+    private String formatParameter(ParameterDTO param) throws Exception {
+        return param.getTestParameterValue();
+    }
+
+
+    private void prepareParameter(ParameterDTO param) throws Exception {
+        Object val = null;
+        String result = "";
+
+        if (param.getClassName() != null) {
+
+            if (ClassUtils.isPrimitive(Class.forName(param.getClassName()))) {
+
+                switch (param.getClassName()) {
+                    case "java.lang.String": {
+                        val = objectMapper.readValue(param.getJsonData(), Class.forName(param.getClassName()));
+                        result = "\"" + val.toString() + "\"";
+                        break;
+                    }
+
+                    default: {
+                        val = objectMapper.readValue(param.getJsonData(), Class.forName(param.getClassName()));
+                    }
+                }
+            } else {
+                result = "var" + (param.getIndex() + 1);
+                val = objectMapper.readValue(param.getJsonData(), Class.forName(param.getClassName()));
+
+                String definition = Class.forName(param.getClassName()).getSimpleName() + " " + result + " = " +
+                "objectMapper.readValue(\"" + val + "\", Class.forName(\"" + param.getClassName() + "\"));";
+                param.setTestParameterDefinition(definition);
+            }
+        } else {
+            result = null;
+        }
+
+        param.setTestParameterValue(result);
     }
 
     public void generateTest(CallDTO callData) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
         if (callData.getParams() != null) {
-            String call = "methodname(";
+            String call = "(";
             boolean coma = false;
             for (ParameterDTO param : callData.getParams()) {
-                Object val = null;
-                if (param.getClassName() != null) {
-                    val = objectMapper.readValue(param.getJsonData(), Class.forName(param.getClassName()));
+                prepareParameter(param);
+            }
+            for (ParameterDTO param : callData.getParams()) {
+                if (!StringUtils.isEmpty(param.getTestParameterDefinition())) {
+                    System.out.println(param.getTestParameterDefinition());
                 }
+            }
 
-                call += coma ? ", " + val : val;
+            for (ParameterDTO param : callData.getParams()) {
+
+                call += coma ? ", " + formatParameter(param) : formatParameter(param);
                 coma = true;
             }
-            System.out.println(">>>>>>>>>>>>>>>" + call + ");");
-
+            System.out.println("" + callData.getClassName() + "." + callData.getMethodName() + call + ");");
         }
-
-//        System.out.println(">>>>>>>>>>>>>>>" + callData);
     }
 }

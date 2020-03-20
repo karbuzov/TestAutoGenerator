@@ -30,7 +30,7 @@ public class BoobleManager {
 //        return result.stream().map(i -> i).collect();
         List<ExampleParameter> lst = new ArrayList<>();
         lst.add(new ExampleParameter("param" + pageNumber, pageNumber));
-        result.add(dataDAO.getData(null, 123L, "3d_param"));
+        result.add(dataDAO.getData(lst, null, "3d_param"));
         return result.toString() + "=======================";
     }
 

@@ -3,6 +3,8 @@ package com.test.dto;
 public class ParameterDTO {
     private String className;
     private String jsonData;
+    private String testParameterValue;
+    private String testParameterDefinition;
     private int index;
 
     public ParameterDTO(String className, String jsonData, int index) {
@@ -21,6 +23,24 @@ public class ParameterDTO {
 
     public int getIndex() {
         return index;
+    }
+
+    public String getTestParameterValue() {
+        return testParameterValue;
+    }
+
+    public ParameterDTO setTestParameterValue(String testParameterValue) {
+        this.testParameterValue = testParameterValue;
+        return this;
+    }
+
+    public String getTestParameterDefinition() {
+        return testParameterDefinition;
+    }
+
+    public ParameterDTO setTestParameterDefinition(String testParameterDefinition) {
+        this.testParameterDefinition = testParameterDefinition;
+        return this;
     }
 
     @Override
