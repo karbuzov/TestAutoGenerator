@@ -1,4 +1,4 @@
-package com.test.dto;
+package com.test.codeGenerator.dto;
 
 public class ParameterDTO {
     private String className;

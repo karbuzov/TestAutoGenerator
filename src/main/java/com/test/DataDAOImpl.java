@@ -1,6 +1,6 @@
 package com.test;
 
-import com.test.dto.ExampleParameter;
+import com.test.codeGenerator.dto.ExampleParameter;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

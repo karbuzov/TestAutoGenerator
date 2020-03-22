@@ -1,9 +1,9 @@
-package com.test;
+package com.test.codeGenerator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.test.utils.ClassUtils;
-import com.test.dto.CallDTO;
-import com.test.dto.ParameterDTO;
+import com.test.codeGenerator.utils.ClassUtils;
+import com.test.codeGenerator.dto.CallDTO;
+import com.test.codeGenerator.dto.ParameterDTO;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -101,7 +101,7 @@ public class AOP {
                 val = objectMapper.readValue(param.getJsonData(), Class.forName(param.getClassName()));
 
                 String definition = Class.forName(param.getClassName()).getSimpleName() + " " + result + " = " +
-                "objectMapper.readValue(\"" + val + "\", Class.forName(\"" + param.getClassName() + "\"));";
+                        "objectMapper.readValue(\"" + val + "\", Class.forName(\"" + param.getClassName() + "\"));";
                 param.setTestParameterDefinition(definition);
             }
         } else {
@@ -118,6 +118,7 @@ public class AOP {
             for (ParameterDTO param : callData.getParams()) {
                 prepareParameter(param);
             }
+            prepareParameter(callData.getResult());
             for (ParameterDTO param : callData.getParams()) {
                 if (!StringUtils.isEmpty(param.getTestParameterDefinition())) {
                     System.out.println(param.getTestParameterDefinition());
@@ -129,7 +130,10 @@ public class AOP {
                 call += coma ? ", " + formatParameter(param) : formatParameter(param);
                 coma = true;
             }
-            System.out.println("" + callData.getClassName() + "." + callData.getMethodName() + call + ");");
+            String resultStr = formatParameter(callData.getResult());
+
+            System.out.println("Object actualValue = " + callData.getClassName() + "." + callData.getMethodName() + call + ");");
+            System.out.println("assertEquals(" + resultStr + ", actualValue);");
         }
     }
 }

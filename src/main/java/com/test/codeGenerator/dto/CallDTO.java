@@ -1,4 +1,4 @@
-package com.test.dto;
+package com.test.codeGenerator.dto;
 
 import java.util.ArrayList;
 import java.util.List;

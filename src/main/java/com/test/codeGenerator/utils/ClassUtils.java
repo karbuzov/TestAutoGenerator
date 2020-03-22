@@ -1,4 +1,4 @@
-package com.test.utils;
+package com.test.codeGenerator.utils;
 
 import java.lang.reflect.Array;
 import java.util.List;
