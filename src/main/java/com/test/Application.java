@@ -11,10 +11,10 @@ import org.springframework.context.event.EventListener;
 public class Application
 {
 
-    BoobleManager boobleManager;
+    FrontController boobleManager;
 
     @Autowired
-    public void setBoobleManager(BoobleManager boobleManager) {
+    public void setBoobleManager(FrontController boobleManager) {
         this.boobleManager = boobleManager;
     }
 

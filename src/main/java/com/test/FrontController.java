@@ -1,8 +1,10 @@
 package com.test;
 
+import com.test.codeGenerator.dto.CallDTO;
 import com.test.codeGenerator.dto.ExampleParameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -10,14 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-public class BoobleManager {
+public class FrontController {
     private List<String> arr = new ArrayList<>();
     private int pageSize;
 
     DataDAOImpl dataDAO;
 
     @Autowired
-    public BoobleManager(DataDAOImpl dataDAO) {
+    public FrontController(DataDAOImpl dataDAO) {
         this.dataDAO = dataDAO;
         this.pageSize = 3;
     }
@@ -34,9 +36,9 @@ public class BoobleManager {
         return result.toString() + "=======================";
     }
 
-    @RequestMapping("/do/{param}")
-    public void doit(@PathVariable("param") final int param){
-        getPage(param);
+    @RequestMapping("/do/")
+    public void doit(@RequestBody CallDTO data) {
+        getPage(1);
     }
 
 }

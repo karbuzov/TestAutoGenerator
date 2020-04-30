@@ -28,7 +28,7 @@ public class AOP {
     protected void myPointcut() {
     }
 
-    @Around("execution(* com.test.BoobleManager.getPage (..)) || " +
+    @Around("execution(* com.test.FrontController.getPage (..)) || " +
             "execution(* com.test.DataDAOImpl.* (..))")
     public void logBefore(ProceedingJoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
