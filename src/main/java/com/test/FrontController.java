@@ -3,10 +3,7 @@ package com.test;
 import com.test.codeGenerator.dto.CallDTO;
 import com.test.codeGenerator.dto.ExampleParameter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +33,7 @@ public class FrontController {
         return result.toString() + "=======================";
     }
 
-    @RequestMapping("/do/")
+    @RequestMapping(value = "/callDTO/", method = RequestMethod.POST)
     public void doit(@RequestBody CallDTO data) {
         getPage(1);
     }

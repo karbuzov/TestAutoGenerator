@@ -7,6 +7,8 @@ public class ParameterDTO {
     private String testParameterDefinition;
     private int index;
 
+    public ParameterDTO() {
+    }
     public ParameterDTO(String className, String jsonData, int index) {
         this.className = className;
         this.jsonData = jsonData;

@@ -8,12 +8,16 @@ public class CallDTO {
     private ParameterDTO result = null;
     private String className;
     private String methodName;
+    private String uid;
 
     public CallDTO(String className, String methodName, List<ParameterDTO> params, ParameterDTO result) {
         this.params = params;
         this.className = className;
         this.methodName = methodName;
         this.result = result;
+    }
+
+    public CallDTO() {
     }
 
     public List<ParameterDTO> getParams() {
@@ -48,6 +52,15 @@ public class CallDTO {
         this.result = result;
     }
 
+    public String getUid() {
+        return uid;
+    }
+
+    public CallDTO setUid(String uid) {
+        this.uid = uid;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "CallDTO{" +
@@ -55,6 +68,7 @@ public class CallDTO {
                 ", className='" + className + '\'' +
                 ", methodName='" + methodName + '\'' +
                 ", result='" + result + '\'' +
+                ", uid='" + uid + '\'' +
                 '}';
     }
 }
