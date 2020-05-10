@@ -1,5 +1,6 @@
 package com.test;
 
+import com.test.codeGenerator.CallsDAOJdbc;
 import com.test.codeGenerator.dto.CallDTO;
 import com.test.codeGenerator.dto.ExampleParameter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +15,12 @@ public class FrontController {
     private int pageSize;
 
     DataDAOImpl dataDAO;
+    CallsDAOJdbc callsDAOJdbc;
 
     @Autowired
-    public FrontController(DataDAOImpl dataDAO) {
+    public FrontController(DataDAOImpl dataDAO, CallsDAOJdbc callsDAOJdbc) {
         this.dataDAO = dataDAO;
+        this.callsDAOJdbc = callsDAOJdbc;
         this.pageSize = 3;
     }
 
@@ -34,7 +37,10 @@ public class FrontController {
     }
 
     @RequestMapping(value = "/callDTO/", method = RequestMethod.POST)
-    public void doit(@RequestBody CallDTO data) {
+    public void doit(@RequestBody CallDTO data) throws Exception {
+
+        callsDAOJdbc.save(data);
+
         getPage(1);
     }
 
