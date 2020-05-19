@@ -1,52 +1,110 @@
-package com.test;
+package com.test.codeGenerator;
 
-import com.test.codeGenerator.TestGenerator;
-import com.test.codeGenerator.CallsDAOJdbc;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.test.codeGenerator.utils.ClassUtils;
 import com.test.codeGenerator.dto.CallDTO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import com.test.codeGenerator.dto.ParameterDTO;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@RestController
-public class FrontController {
-    private List<String> arr = new ArrayList<>();
-    private int pageSize;
+@Service
+public class TestGenerator {
 
-    DataDAOImpl dataDAO;
-    CallsDAOJdbc callsDAOJdbc;
-    TestGenerator testGenerator;
+    ObjectMapper objectMapper = new ObjectMapper();
 
-    @Autowired
-    public FrontController(DataDAOImpl dataDAO, CallsDAOJdbc callsDAOJdbc, TestGenerator testGenerator) {
-        this.dataDAO = dataDAO;
-        this.callsDAOJdbc = callsDAOJdbc;
-        this.pageSize = 3;
-        this.testGenerator = testGenerator;
+    public TestGenerator() {
+        System.out.println("****  AOP ***");
+    }
+
+    private String formatParameter(ParameterDTO param) throws Exception {
+        return param.getTestParameterValue();
     }
 
 
-    public String getPage(int pageNumber) {
-        try {
-            List<CallDTO> list = callsDAOJdbc.load("5ed06a88-2044-4690-8eba-f2416cbe9815");
-            String result = testGenerator.generateTest(list);
-            System.out.println(result);
+    private void prepareParameter(ParameterDTO param) throws Exception {
+        Object val = null;
+        String result = "";
 
-//{"params":[{"className":"com.pragmaticplay.bingo.bonusservice.controllers.dto.ActiveFreeTicketsRequest","jsonData":"{\"playerID\":453816,\"roomID\":0}","testParameterValue":null,"testParameterDefinition":null,"index":0,"classPrimitive":false}],"result":{"className":"java.util.ArrayList","jsonData":"" +
-//"[{\"roomIDList\":\"1262\",\"bonusCode\":\"BC1587642892646\",\"expirationDate\":1594846799409,\"freeTicketsType\":\"STANDARD\",\"status\":\"Pending\",\"activeFreeTickets\":5,\"playedFreeTickets\":0,\"awardingDate\":1586768121885,\"minCostTicket\":0.0,\"maxCostTicket\":0.0}]"
-//,"testParameterValue":null,"testParameterDefinition":null,"index":1,"classPrimitive":false},"className":"com.pragmaticplay.bingo.bonusservice.services.IntegrationFreeTicketsManagerImpl","methodName":"activeFreeTickets","uid":"5ed06a88-2044-4690-8eba-f2416cbe9815"}
-//{"params":[{"className":"com.pragmaticplay.bingo.bonusservice.controllers.dto.ActiveFreeTicketsRequest","jsonData":"{\"playerID\":453816,\"roomID\":0}","testParameterValue":null,"testParameterDefinition":null,"index":0,"classPrimitive":false}],"result":{"className":"com.pragmaticplay.bingo.bonusservice.controllers.dto.BaseResponse","jsonData":"{\"status\":0,\"description\":\"OK.\",\"value\":{\"bonuses\":null}}","testParameterValue":null,"testParameterDefinition":null,"index":1,"classPrimitive":false},"className":"com.pragmaticplay.bingo.bonusservice.controllers.IntegrationFreeTicketsController","methodName":"activeFreeTickets","uid":"5ed06a88-2044-4690-8eba-f2416cbe9815"}
+        if (param.getClassName() != null) {
+
+            if (param.isClassPrimitive()) {
+
+                switch (param.getClassName()) {
+                    case "java.lang.String": {
+                        val = objectMapper.readValue(param.getJsonData(), Class.forName(param.getClassName()));
+                        result = "\"" + val.toString() + "\"";
+                        break;
+                    }
+
+                    default: {
+                        val = objectMapper.readValue(param.getJsonData(), Class.forName(param.getClassName()));
+                    }
+                }
+            } else {
+                result = "var" + (param.getIndex() + 1);
+
+                String definition = param.getClassName() + " " + result + " = " +
+                        "objectMapper.readValue(requestJson, " + getSimpleClassName(param.getClassName()) + ");";
+                param.setTestParameterDefinition(definition);
+            }
+        } else {
+            result = null;
+        }
+
+        param.setTestParameterValue(result);
+    }
+
+    public String getSimpleClassName(String fullClassName) throws Exception {
+        String[] strList = fullClassName.split("\\.");
+        if (strList.length == 0) {
+            return "==noclass==.class";
+        }
+        return strList[strList.length - 1] + ".class";
+    }
 
 
+    public String generateTest(List<CallDTO> list) throws Exception {
+        String resultStr = "";
+        String call = "";
+        CallDTO callData = list.get(0);
 
+        for (int i = 1; i < list.size(); i++) {
+            callData.getParams().addAll(list.get(i).getParams());
+        }
+
+
+        if (callData.getParams() != null) {
+            call = "(";
+            boolean coma = false;
+            for (ParameterDTO param : callData.getParams()) {
+                prepareParameter(param);
+            }
+            prepareParameter(callData.getResult());
             String test = "    @Test\n" +
                     "    public void activeFreeTickets2() throws Exception {\n" +
-                    "\n" +
-                    "        String requestJson = \"{\\\"playerID\\\":453816,\\\"roomID\\\":1242}\";\n" +
-                    "        ActiveFreeTicketsRequest var1 = objectMapper.readValue(requestJson, ActiveFreeTicketsRequest.class);\n" +
-                    "\n" +
-                    "        String dependencyJson = \"[{\\\"roomIDList\\\":\\\"1262\\\",\\\"bonusCode\\\":\\\"BCThu Apr 23 2020 11:13:51 GMT+0300 (RTZ 2 (зима))\\\",\\\"expirationDate\\\":1587629631901,\\\"freeTicketsType\\\":\\\"STANDARD\\\",\\\"status\\\":\\\"Pending\\\",\\\"activeFreeTickets\\\":5,\\\"playedFreeTickets\\\":0,\\\"awardingDate\\\":1586754833917,\\\"minCostTicket\\\":0.0,\\\"maxCostTicket\\\":2.0},\" +\n" +
+                    "\n";
+//            for (ParameterDTO param : callData.getParams()) {
+            for (int i = 0; i < callData.getParams().size() - 1; i++) {
+                ParameterDTO param = callData.getParams().get(i);
+                if (!StringUtils.isEmpty(param.getTestParameterDefinition())) {
+                    System.out.println(param.getTestParameterDefinition());
+
+                    test += "        String requestJson = \"" + param.getJsonData().replace("\"","\\\"") + "\";\n" +
+                            "        " + param.getTestParameterDefinition() + "\n" +
+                            "\n";
+
+                }
+            }
+
+            test += "        String dependencyJson = \"[{\\\"roomIDList\\\":\\\"1262\\\",\\\"bonusCode\\\":\\\"BCThu Apr 23 2020 11:13:51 GMT+0300 (RTZ 2 (зима))\\\",\\\"expirationDate\\\":1587629631901,\\\"freeTicketsType\\\":\\\"STANDARD\\\",\\\"status\\\":\\\"Pending\\\",\\\"activeFreeTickets\\\":5,\\\"playedFreeTickets\\\":0,\\\"awardingDate\\\":1586754833917,\\\"minCostTicket\\\":0.0,\\\"maxCostTicket\\\":2.0},\" +\n" +
                     "                \"{\\\"roomIDList\\\":\\\"1262\\\",\\\"bonusCode\\\":\\\"BC23\\\",\\\"expirationDate\\\":1587629651179,\\\"freeTicketsType\\\":\\\"STANDARD\\\",\\\"status\\\":\\\"Pending\\\",\\\"activeFreeTickets\\\":5,\\\"playedFreeTickets\\\":0,\\\"awardingDate\\\":1586754853150,\\\"minCostTicket\\\":0.0,\\\"maxCostTicket\\\":2.0},\" +\n" +
                     "                \"{\\\"roomIDList\\\":\\\"1262\\\",\\\"bonusCode\\\":\\\"BC1587629820144\\\",\\\"expirationDate\\\":1587629820144,\\\"freeTicketsType\\\":\\\"STANDARD\\\",\\\"status\\\":\\\"Pending\\\",\\\"activeFreeTickets\\\":5,\\\"playedFreeTickets\\\":0,\\\"awardingDate\\\":1586755022146,\\\"minCostTicket\\\":0.0,\\\"maxCostTicket\\\":2.0},\" +\n" +
                     "                \"{\\\"roomIDList\\\":\\\"1262\\\",\\\"bonusCode\\\":\\\"BC1587642892646\\\",\\\"expirationDate\\\":1594846799409,\\\"freeTicketsType\\\":\\\"STANDARD\\\",\\\"status\\\":\\\"Pending\\\",\\\"activeFreeTickets\\\":5,\\\"playedFreeTickets\\\":0,\\\"awardingDate\\\":1586768121885,\\\"minCostTicket\\\":0.0,\\\"maxCostTicket\\\":0.0},\" +\n" +
@@ -76,19 +134,15 @@ public class FrontController {
                     "        assertEquals(resultJson, actualResultJson);\n" +
                     "    }\n";
 
+            for (ParameterDTO param : callData.getParams()) {
 
-        }catch (Exception e) {
-            e.printStackTrace();
+                call += coma ? ", " + formatParameter(param) : formatParameter(param);
+                coma = true;
+            }
+            resultStr = formatParameter(callData.getResult());
+
         }
-        return "1";
+        return "==================== Object actualValue = " + callData.getClassName() + "." + callData.getMethodName() + call + "); \n\n\n" +
+                "==================== assertEquals(" + resultStr + ", actualValue);";
     }
-
-    @RequestMapping(value = "/callDTO/", method = RequestMethod.POST)
-    public void doit(@RequestBody CallDTO data) throws Exception {
-
-        callsDAOJdbc.save(data);
-
-        getPage(1);
-    }
-
 }

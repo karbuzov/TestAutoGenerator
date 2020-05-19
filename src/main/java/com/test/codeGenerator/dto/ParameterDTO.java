@@ -2,14 +2,18 @@ package com.test.codeGenerator.dto;
 
 public class ParameterDTO {
     private String className;
+    private boolean isClassPrimitive;
     private String jsonData;
     private String testParameterValue;
     private String testParameterDefinition;
     private int index;
+    private boolean classPrimitive;
+
 
     public ParameterDTO() {
     }
-    public ParameterDTO(String className, String jsonData, int index) {
+    public ParameterDTO(String className, boolean isClassPrimitive, String jsonData, int index) {
+        this.isClassPrimitive = isClassPrimitive;
         this.className = className;
         this.jsonData = jsonData;
         this.index = index;
@@ -45,12 +49,27 @@ public class ParameterDTO {
         return this;
     }
 
+    public boolean isClassPrimitive() {
+        return isClassPrimitive;
+    }
+
+    public boolean getClassPrimitive() {
+        return classPrimitive;
+    }
+
+    public ParameterDTO setClassPrimitive(boolean classPrimitive) {
+        this.classPrimitive = classPrimitive;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "ParameterDTO{" +
                 "className='" + className + '\'' +
                 ", jsonData='" + jsonData + '\'' +
                 ", index=" + index +
+                ", isClassPrimitive=" + isClassPrimitive +
+                ", classPrimitive='" + classPrimitive + '\'' +
                 '}';
     }
 }

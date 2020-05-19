@@ -7,6 +7,8 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.io.IOException;
+import java.util.List;
 
 @Repository
 public class CallsDAOJdbc extends JdbcDaoSupport {
@@ -19,6 +21,26 @@ public class CallsDAOJdbc extends JdbcDaoSupport {
 
     public void save(CallDTO call) throws Exception{
         String json = objectMapper.writeValueAsString(call);
-        getJdbcTemplate().update("insert into z_arbuzov_tmp(id, text) values (?, ?)", call.getUid(), json);
+        getJdbcTemplate().update("insert into z_arbuzov_tmp(id, requestid, text, inserted) values (sq_z_arbuzov_tmp.nextval, ?, ?, sysdate)", call.getUid(), json);
     }
+
+
+    public List<CallDTO> load(String id) throws Exception {
+        String sql = "select id, requestid, text, inserted " +
+                "from z_arbuzov_tmp " +
+                "where requestid = ? " +
+                "order by id";
+        return getJdbcTemplate().query(sql, new Object[]{id}, (rs, i) ->
+        {
+            String json = rs.getString("text");
+
+            try {
+                return objectMapper.readValue(json, CallDTO.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        });
+    }
+
 }
