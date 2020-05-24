@@ -25,7 +25,7 @@ public class CallsDAOJdbc extends JdbcDaoSupport {
     }
 
 
-    public List<CallDTO> load(String id) throws Exception {
+    public List<String> load(String id) throws Exception {
         String sql = "select id, requestid, text, inserted " +
                 "from z_arbuzov_tmp " +
                 "where requestid = ? " +
@@ -33,13 +33,7 @@ public class CallsDAOJdbc extends JdbcDaoSupport {
         return getJdbcTemplate().query(sql, new Object[]{id}, (rs, i) ->
         {
             String json = rs.getString("text");
-
-            try {
-                return objectMapper.readValue(json, CallDTO.class);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
+            return json;
         });
     }
 

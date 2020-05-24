@@ -1,11 +1,13 @@
 package com.test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.test.codeGenerator.TestGenerator;
 import com.test.codeGenerator.CallsDAOJdbc;
 import com.test.codeGenerator.dto.CallDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +31,11 @@ public class FrontController {
 
     public String getPage(int pageNumber) {
         try {
-            List<CallDTO> list = callsDAOJdbc.load("5ed06a88-2044-4690-8eba-f2416cbe9815");
+            List<String> jsonList = callsDAOJdbc.load("5ed06a88-2044-4690-8eba-f2416cbe9815");
+
+            List<CallDTO> list = testGenerator.getCallsFromJsonList(jsonList);
+            if (list == null) return null;
+
             String result = testGenerator.generateTest(list);
             System.out.println(result);
 
@@ -82,6 +88,7 @@ public class FrontController {
         }
         return "1";
     }
+
 
     @RequestMapping(value = "/callDTO/", method = RequestMethod.POST)
     public void doit(@RequestBody CallDTO data) throws Exception {
