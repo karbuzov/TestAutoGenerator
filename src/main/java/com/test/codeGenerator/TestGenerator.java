@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.test.codeGenerator.dto.CallDTO;
 import com.test.codeGenerator.dto.ParameterDTO;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -105,8 +104,8 @@ public class TestGenerator {
 //            for (ParameterDTO param : callData.getParams()) {
 
                 test += formatReqResp(list, i, "mock" + (i + 1), false);
-                test += "\n" +
-                        "        when(freeTicketsManager." + callData.getMethodName() + "(any())).thenReturn(" + "mock" + (i + 1) + ");\n\n";
+//                test += "\n" +
+//                        "        when(freeTicketsManager." + callData.getMethodName() + "(any())).thenReturn(" + "mock" + (i + 1) + ");\n\n";
 
                 for (ParameterDTO param : callData.getParams()) {
 
@@ -118,54 +117,70 @@ public class TestGenerator {
             }
         }
 
-        test += formatReqResp(list,list.size() - 1, "request", true);
-
-        test += "\n" +
-                "\n" +
-                "\n" +
-                "        BaseResponse<ActiveFreeTicketsResponse> actualResult = controller.activeFreeTickets(var1);\n" +
-                "        String actualResultJson = objectMapper.writeValueAsString(actualResult);\n" +
-                "\n" +
-                "        assertEquals(resultJson, actualResultJson);\n" +
-                "    }\n";
+//        test += formatReqResp(list,list.size() - 1, "request", true);
+//
 
         return test;
     }
 
     private String formatReqResp(List<CallDTO> list, int index, String varName, boolean isResult) {
         CallDTO callData = list.get(index);
-        String test = "";
-        String dd = "";
-        for (int i = 0; i < callData.getParams().size(); i++) {
-            ParameterDTO param = callData.getParams().get(i);
-            if (isResult && !StringUtils.isEmpty(param.getTestParameterDefinition())) {
-                System.out.println(param.getTestParameterDefinition());
 
-                dd += "        String " + varName + "Json = \"" + param.getJsonData().replace("\"","\\\"") + "\";\n" +
-                        "        " + param.getTestParameterDefinition() +"  \n" +
-                        "\n";
+        String dd = "        String " + varName + "Json = \"" + callData.getResult().getJsonData().replace("\"", "\\\"") + "\";\n";
+        dd += "        " + callData.getResult().getTestParameterDefinition();
 
-            }
-        }
+        dd = dd.replace(".class varr123asdf ", " " + varName + " ");
+        dd = dd.replace(".readValue(requestJson, ", ".readValue(" + varName + "Json, ");
 
-        if (!isResult) {
-            dd += "        String " + varName + "Json = \"" + callData.getResult().getJsonData().replace("\"", "\\\"") + "\";\n";
-            dd += "        " + callData.getResult().getTestParameterDefinition();
+int i = 0;
+        String test = dd +
+                "\n" +
+                "\n" +
+                "\n" +
+                "        when(manager." + callData.getMethodName() + "(any())).thenReturn(" + "mock" + (i + 1) + ");\n" +
+                "\n" + "";
 
-            dd = dd.replace(".class varr123asdf ", " " + varName + " ");
-            dd = dd.replace(".readValue(requestJson, ", ".readValue(" + varName + "Json, ");
-        } else {
-            callData = list.get(0);
-            dd += "        String responseJson = \"" + callData.getResult().getJsonData().replace("\"", "\\\"") + "\";\n";
-            dd += "        " + callData.getResult().getTestParameterDefinition();
+        dd = "        String requestJson = \"" + list.get(i).getParams().get(0).getJsonData()
+                .replace("\"", "\\\"") + "\";\n";
+        dd += "        " + list.get(i + 1).getParams().get(0).getTestParameterDefinition();
 
-            dd = dd.replace(".class varr123asdf ", " actualResponse ");
-            dd = dd.replace(".readValue(requestJson, ", ".readValue(responseJson, ");
+        dd = dd.replace(".class varr123asdf ", " request ");
+        dd = dd.replace(".readValue(requestJson, ", ".readValue(requestJson, ");
+        dd = dd + "  ";
 
-        }
 
-        test += dd + "\n" +
-                "\n==========================";
+        test = test + dd +
+                "\n" +
+
+                "\n" + "";
+
+        dd = "        String responseJson = \"" + list.get(i).getResult().getJsonData().replace("\"", "\\\"") + "\";\n";
+        dd += "        " + list.get(i).getResult().getTestParameterDefinition();
+
+        dd = dd.replace(".class varr123asdf ", " actualResponse ");
+        dd = dd.replace(".readValue(requestJson, ", ".readValue(responseJson, ");
+        dd = dd + "\n";
+
+        test = test + dd +
+
+                "\n";
+
+        dd = "        String resultJson = \"" + list.get(i + 1).getResult().getJsonData()
+                .replace("\"", "\\\"") + "\";\n";
+        dd += "        " + list.get(i + 1).getResult().getTestParameterDefinition();
+
+        dd = dd.replace(".class varr123asdf ", " result ");
+        dd = dd.replace(".readValue(requestJson, ", ".readValue(resultJson, ");
+        dd = dd + "\n";
+
+        test = test + dd +
+                "\n" +
+                "        BaseResponse<ActiveFreeTicketsResponse> actualResult = controller.activeFreeTickets(request);\n" +
+                "        String actualResultJson = objectMapper.writeValueAsString(result);\n" +
+                "\n" +
+                "        assertEquals(resultJson, actualResultJson);\n" +
+                "    }\n";
+
 
         return test;
     }

@@ -36,7 +36,7 @@ public class FrontControllerTest {
                 "        ArrayList<FreeRoundBonus> mock1 = objectMapper.readValue(mock1Json, ArrayList.class);\n" +
                 "\n" +
                 "\n" +
-                "        when(freeTicketsManager.activeFreeTickets(any())).thenReturn(mock1);\n" +
+                "        when(manager.activeFreeTickets(any())).thenReturn(mock1);\n" +
                 "\n" +
                 "        String requestJson = \"{\\\"playerID\\\":453816,\\\"roomID\\\":0}\";\n" +
                 "        ActiveFreeTicketsRequest request = objectMapper.readValue(requestJson, ActiveFreeTicketsRequest.class);  \n" +
