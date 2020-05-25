@@ -39,7 +39,7 @@ public class FrontControllerTest {
                 "        when(freeTicketsManager.activeFreeTickets(any())).thenReturn(mock1);\n" +
                 "\n" +
                 "        String requestJson = \"{\\\"playerID\\\":453816,\\\"roomID\\\":0}\";\n" +
-                "        ActiveFreeTicketsRequest request = objectMapper.readValue(requestJson, ActiveFreeTicketsRequest.class);\n" +
+                "        ActiveFreeTicketsRequest request = objectMapper.readValue(requestJson, ActiveFreeTicketsRequest.class);  \n" +
                 "\n" +
                 "        String responseJson = \"[{\\\"roomIDList\\\":\\\"1262\\\",\\\"bonusCode\\\":\\\"BC1587642892646\\\",\\\"expirationDate\\\":1594846799409,\\\"freeTicketsType\\\":\\\"STANDARD\\\",\\\"status\\\":\\\"Pending\\\",\\\"activeFreeTickets\\\":5,\\\"playedFreeTickets\\\":0,\\\"awardingDate\\\":1586768121885,\\\"minCostTicket\\\":0.0,\\\"maxCostTicket\\\":0.0}]\";\n" +
                 "        ArrayList<FreeRoundBonus> actualResponse = objectMapper.readValue(responseJson, ArrayList.class);\n" +

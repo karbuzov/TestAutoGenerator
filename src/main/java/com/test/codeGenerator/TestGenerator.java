@@ -59,7 +59,7 @@ public class TestGenerator {
                     }
                 }
             } else {
-                result = "var" + (param.getIndex() + 1);
+                result = "varr123asdf";
 
                 String definition = getSimpleClassName(param.getClassName()) + " " + result + " = " +
                         "objectMapper.readValue(requestJson, " + getSimpleClassName(param.getClassName()) + ");";
@@ -104,7 +104,7 @@ public class TestGenerator {
 
 //            for (ParameterDTO param : callData.getParams()) {
 
-                test += formatReqResp(callData, "mock" + (i + 1));
+                test += formatReqResp(list, i, "mock" + (i + 1), false);
                 test += "\n" +
                         "        when(freeTicketsManager." + callData.getMethodName() + "(any())).thenReturn(" + "mock" + (i + 1) + ");\n\n";
 
@@ -118,8 +118,7 @@ public class TestGenerator {
             }
         }
 
-        CallDTO resultData = list.get(list.size() - 1);
-        test += formatReqResp(resultData, "resp");
+        test += formatReqResp(list,list.size() - 1, "request", true);
 
         test += "\n" +
                 "\n" +
@@ -133,26 +132,40 @@ public class TestGenerator {
         return test;
     }
 
-    private String formatReqResp(CallDTO callData, String varName) {
+    private String formatReqResp(List<CallDTO> list, int index, String varName, boolean isResult) {
+        CallDTO callData = list.get(index);
         String test = "";
-        for (int i = 0; i < callData.getParams().size() - 1; i++) {
+        String dd = "";
+        for (int i = 0; i < callData.getParams().size(); i++) {
             ParameterDTO param = callData.getParams().get(i);
-            if (!StringUtils.isEmpty(param.getTestParameterDefinition())) {
+            if (isResult && !StringUtils.isEmpty(param.getTestParameterDefinition())) {
                 System.out.println(param.getTestParameterDefinition());
 
-                test += "        String " + varName + "Json = \"" + param.getJsonData().replace("\"","\\\"") + "\";\n" +
-                        "        " + param.getTestParameterDefinition().replace("(requestJson", "(" + varName + "Json") + "\n" +
+                dd += "        String " + varName + "Json = \"" + param.getJsonData().replace("\"","\\\"") + "\";\n" +
+                        "        " + param.getTestParameterDefinition() +"  \n" +
                         "\n";
 
             }
         }
 
-        test += "        String resultJson = \"" + callData.getResult().getJsonData().replace("\"","\\\"") + "\";\n" +
-                "        " + callData.getResult().getTestParameterDefinition().replace("(requestJson", "(resultJson")
-                .replace("var2 =", "result =")
+        if (!isResult) {
+            dd += "        String " + varName + "Json = \"" + callData.getResult().getJsonData().replace("\"", "\\\"") + "\";\n";
+            dd += "        " + callData.getResult().getTestParameterDefinition();
 
-                + "\n" +
-                "\n// ========================================\n";
+            dd = dd.replace(".class varr123asdf ", " " + varName + " ");
+            dd = dd.replace(".readValue(requestJson, ", ".readValue(" + varName + "Json, ");
+        } else {
+            callData = list.get(0);
+            dd += "        String responseJson = \"" + callData.getResult().getJsonData().replace("\"", "\\\"") + "\";\n";
+            dd += "        " + callData.getResult().getTestParameterDefinition();
+
+            dd = dd.replace(".class varr123asdf ", " actualResponse ");
+            dd = dd.replace(".readValue(requestJson, ", ".readValue(responseJson, ");
+
+        }
+
+        test += dd + "\n" +
+                "\n==========================";
 
         return test;
     }
