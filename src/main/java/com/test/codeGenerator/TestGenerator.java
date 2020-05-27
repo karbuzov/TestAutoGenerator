@@ -1,6 +1,7 @@
 package com.test.codeGenerator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.deploy.util.StringUtils;
 import com.test.codeGenerator.dto.CallDTO;
 import com.test.codeGenerator.dto.ParameterDTO;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TestGenerator {
@@ -60,8 +62,17 @@ public class TestGenerator {
             } else {
                 result = "varr123asdf";
 
-                String definition = getSimpleClassName(param.getClassName()) + " " + result + " = " +
-                        "objectMapper.readValue(requestJson, " + getSimpleClassName(param.getClassName()) + ");";
+                String definition = getSimpleClassName(param.getClassName(), false);
+                if (param.getParametrized() != null && !param.getParametrized().isEmpty()) {
+                    definition += "<" +
+                            StringUtils.join(param.getParametrized().stream()
+                                    .map(i -> getSimpleClassName(i, false))
+                                    .collect(Collectors.toList()), ",") +
+                            ">";
+                }
+
+                definition += " " + result + " = " +
+                        "objectMapper.readValue(requestJson, " + getSimpleClassName(param.getClassName(), true) + ");";
                 param.setTestParameterDefinition(definition);
             }
         } else {
@@ -71,12 +82,12 @@ public class TestGenerator {
         param.setTestParameterValue(result);
     }
 
-    public String getSimpleClassName(String fullClassName) throws Exception {
+    public String getSimpleClassName(String fullClassName, boolean addClass) {
         String[] strList = fullClassName.split("\\.");
         if (strList.length == 0) {
             return "==noclass==.class";
         }
-        return strList[strList.length - 1] + ".class";
+        return strList[strList.length - 1] + (addClass ? ".class":"");
     }
 
 
@@ -124,27 +135,26 @@ public class TestGenerator {
     }
 
     private String formatReqResp(List<CallDTO> list, int index, String varName, boolean isResult) {
-        CallDTO callData = list.get(index);
 
-        String dd = "        String " + varName + "Json = \"" + callData.getResult().getJsonData().replace("\"", "\\\"") + "\";\n";
-        dd += "        " + callData.getResult().getTestParameterDefinition();
+        int i = 0;
+        String dd = "        String " + varName + "Json = \"" + list.get(i).getResult().getJsonData().replace("\"", "\\\"") + "\";\n";
+        dd += "        " + list.get(i).getResult().getTestParameterDefinition();
 
-        dd = dd.replace(".class varr123asdf ", " " + varName + " ");
+        dd = dd.replace(" varr123asdf ", " " + varName + " ");
         dd = dd.replace(".readValue(requestJson, ", ".readValue(" + varName + "Json, ");
 
-int i = 0;
         String test = dd +
                 "\n" +
                 "\n" +
                 "\n" +
-                "        when(manager." + callData.getMethodName() + "(any())).thenReturn(" + "mock" + (i + 1) + ");\n" +
+                "        when(manager." + list.get(i).getMethodName() + "(any())).thenReturn(" + "mock" + (i + 1) + ");\n" +
                 "\n" + "";
 
         dd = "        String requestJson = \"" + list.get(i).getParams().get(0).getJsonData()
                 .replace("\"", "\\\"") + "\";\n";
         dd += "        " + list.get(i + 1).getParams().get(0).getTestParameterDefinition();
 
-        dd = dd.replace(".class varr123asdf ", " request ");
+        dd = dd.replace(" varr123asdf ", " request ");
         dd = dd.replace(".readValue(requestJson, ", ".readValue(requestJson, ");
         dd = dd + "  ";
 
@@ -157,7 +167,7 @@ int i = 0;
         dd = "        String responseJson = \"" + list.get(i).getResult().getJsonData().replace("\"", "\\\"") + "\";\n";
         dd += "        " + list.get(i).getResult().getTestParameterDefinition();
 
-        dd = dd.replace(".class varr123asdf ", " actualResponse ");
+        dd = dd.replace(" varr123asdf ", " actualResponse ");
         dd = dd.replace(".readValue(requestJson, ", ".readValue(responseJson, ");
         dd = dd + "\n";
 
@@ -169,7 +179,7 @@ int i = 0;
                 .replace("\"", "\\\"") + "\";\n";
         dd += "        " + list.get(i + 1).getResult().getTestParameterDefinition();
 
-        dd = dd.replace(".class varr123asdf ", " result ");
+        dd = dd.replace(" varr123asdf ", " result ");
         dd = dd.replace(".readValue(requestJson, ", ".readValue(resultJson, ");
         dd = dd + "\n";
 

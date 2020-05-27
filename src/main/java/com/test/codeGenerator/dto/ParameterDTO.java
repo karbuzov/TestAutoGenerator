@@ -1,22 +1,27 @@
 package com.test.codeGenerator.dto;
 
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class ParameterDTO {
     private String className;
-    private boolean isClassPrimitive;
+    private boolean classPrimitive;
     private String jsonData;
     private String testParameterValue;
     private String testParameterDefinition;
+    private List<String> parametrized = new ArrayList<>();
     private int index;
-    private boolean classPrimitive;
-
 
     public ParameterDTO() {
     }
-    public ParameterDTO(String className, boolean isClassPrimitive, String jsonData, int index) {
-        this.isClassPrimitive = isClassPrimitive;
+
+    public ParameterDTO(String className, boolean isClassPrimitive, String jsonData, int index, List<String> parametrized) {
+        this.classPrimitive = classPrimitive;
         this.className = className;
         this.jsonData = jsonData;
         this.index = index;
+        this.parametrized = parametrized;
     }
 
     public String getClassName() {
@@ -50,16 +55,11 @@ public class ParameterDTO {
     }
 
     public boolean isClassPrimitive() {
-        return isClassPrimitive;
-    }
-
-    public boolean getClassPrimitive() {
         return classPrimitive;
     }
 
-    public ParameterDTO setClassPrimitive(boolean classPrimitive) {
-        this.classPrimitive = classPrimitive;
-        return this;
+    public List<String> getParametrized() {
+        return parametrized;
     }
 
     @Override
@@ -68,8 +68,8 @@ public class ParameterDTO {
                 "className='" + className + '\'' +
                 ", jsonData='" + jsonData + '\'' +
                 ", index=" + index +
-                ", isClassPrimitive=" + isClassPrimitive +
-                ", classPrimitive='" + classPrimitive + '\'' +
+                ", classPrimitive=" + classPrimitive +
+                ", parametrized=" + parametrized +
                 '}';
     }
 }

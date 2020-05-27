@@ -27,7 +27,7 @@ public class Application
 
     @EventListener(ApplicationReadyEvent.class)
     public void onrun() {
-        boobleManager.getPage(13);
+//        boobleManager.getPage(13);
     }
 
 
