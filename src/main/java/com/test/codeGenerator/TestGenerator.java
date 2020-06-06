@@ -95,19 +95,19 @@ public class TestGenerator {
         String resultStr = "";
         String call = "";
 
-
+        CallDTO callData = null;
         for (int i = 0; i < list.size(); i++) {
-            CallDTO callData = list.get(i);
+            callData = list.get(i);
             for (ParameterDTO param : callData.getParams()) {
                 prepareParameter(param);
             }
             prepareParameter(callData.getResult());
         }
         String test = "    @Test\n" +
-                "    public void activeFreeTickets2() throws Exception {\n" +
+                "    public void " + callData.getMethodName()+ "() throws Exception {\n" +
                 "\n";
         for (int i = 0; i < list.size()-1; i++) {
-            CallDTO callData = list.get(i);
+            callData = list.get(i);
             if (callData.getParams() != null) {
 
                 boolean coma = false;
@@ -137,8 +137,23 @@ public class TestGenerator {
     private String formatReqResp(List<CallDTO> list, int index, String varName, boolean isResult) {
 
         int i = 0;
+        String def = "";
         String dd = "        String " + varName + "Json = \"" + list.get(i).getResult().getJsonData().replace("\"", "\\\"") + "\";\n";
-        dd += "        " + list.get(i).getResult().getTestParameterDefinition();
+        ParameterDTO result = list.get(i).getResult();
+
+        if (result.isClassPrimitive()) {
+            dd = "";
+            String type = getSimpleClassName(result.getClassName(), false);
+            def = type + " " + varName + " = " + "" + result.getJsonData();
+
+            if (type.equals("Long")) {
+                def = def + "L";
+            }
+            def = def + ";";
+        } else {
+            def += result.getTestParameterDefinition();
+        }
+        dd += "        " + def;
 
         dd = dd.replace(" varr123asdf ", " " + varName + " ");
         dd = dd.replace(".readValue(requestJson, ", ".readValue(" + varName + "Json, ");

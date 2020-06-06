@@ -19,7 +19,7 @@ public class FrontControllerTest {
     }
 
     @Test
-    public void getPage() throws Exception {
+    public void test1() throws Exception {
         List<String> jsonList = new ArrayList<>();
 
 
@@ -33,7 +33,7 @@ public class FrontControllerTest {
 
         String result = testGenerator.generateTest(list);
         String expected = "    @Test\n" +
-                "    public void activeFreeTickets2() throws Exception {\n" +
+                "    public void activeFreeTickets() throws Exception {\n" +
                 "\n" +
                 "        String mock1Json = \"[{\\\"roomIDList\\\":\\\"1262\\\",\\\"bonusCode\\\":\\\"BC1587642892646\\\",\\\"expirationDate\\\":1594846799409,\\\"freeTicketsType\\\":\\\"STANDARD\\\",\\\"status\\\":\\\"Pending\\\",\\\"activeFreeTickets\\\":5,\\\"playedFreeTickets\\\":0,\\\"awardingDate\\\":1586768121885,\\\"minCostTicket\\\":0.0,\\\"maxCostTicket\\\":0.0}]\";\n" +
                 "        ArrayList<FreeRoundBonus> mock1 = objectMapper.readValue(mock1Json, ArrayList.class);\n" +
@@ -52,6 +52,42 @@ public class FrontControllerTest {
                 "\n" +
                 "        BaseResponse<ActiveFreeTicketsResponse> actualResult = controller.activeFreeTickets(request);\n" +
                 "        String actualResultJson = objectMapper.writeValueAsString(result);\n" +
+                "\n" +
+                "        assertEquals(resultJson, actualResultJson);\n" +
+                "    }\n";
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test2() throws Exception {
+        List<String> jsonList = new ArrayList<>();
+
+        jsonList.add("{\"params\":[{\"className\":\"com.pragmaticplay.bingo.bonusservice.controllers.dto.CreateFreeTicketsRequest\",\"classPrimitive\":false,\"jsonData\":\"{\\\"playerID\\\":453816,\\\"brandID\\\":1051,\\\"freeTicketsType\\\":\\\"STANDARD\\\",\\\"roomIDList\\\":[1262],\\\"freeTickets\\\":5,\\\"minCostTicket\\\":null,\\\"maxCostTicket\\\":null,\\\"bonusCode\\\":\\\"BC1592333087794\\\",\\\"expirationDate\\\":0}\",\"testParameterValue\":null,\"testParameterDefinition\":null,\"parametrized\":null,\"index\":0}],\"result\":{\"className\":\"java.lang.Long\",\"classPrimitive\":true,\"jsonData\":\"0\",\"testParameterValue\":null,\"testParameterDefinition\":null,\"parametrized\":null,\"index\":1},\"className\":\"com.pragmaticplay.bingo.bonusservice.services.IntegrationFreeTicketsManagerImpl\",\"methodName\":\"create\",\"uid\":\"aaa47db9-8d81-44ed-a849-7c9e0b1c062d\"}");
+        jsonList.add("{\"params\":[{\"className\":\"com.pragmaticplay.bingo.bonusservice.controllers.dto.CreateFreeTicketsRequest\",\"classPrimitive\":false,\"jsonData\":\"{\\\"playerID\\\":453816,\\\"brandID\\\":1051,\\\"freeTicketsType\\\":\\\"STANDARD\\\",\\\"roomIDList\\\":[1262],\\\"freeTickets\\\":5,\\\"minCostTicket\\\":null,\\\"maxCostTicket\\\":null,\\\"bonusCode\\\":\\\"BC1592333087794\\\",\\\"expirationDate\\\":0}\",\"testParameterValue\":null,\"testParameterDefinition\":null,\"parametrized\":null,\"index\":0}],\"result\":{\"className\":\"com.pragmaticplay.bingo.bonusservice.controllers.dto.BaseResponse\",\"classPrimitive\":false,\"jsonData\":\"{\\\"status\\\":0,\\\"description\\\":\\\"OK.\\\",\\\"value\\\":{\\\"providerPlayerId\\\":453816,\\\"bonusCode\\\":\\\"BC1592333087794\\\"}}\",\"testParameterValue\":null,\"testParameterDefinition\":null,\"parametrized\":null,\"index\":1},\"className\":\"com.pragmaticplay.bingo.bonusservice.controllers.IntegrationFreeTicketsController\",\"methodName\":\"createFreeTickets\",\"uid\":\"aaa47db9-8d81-44ed-a849-7c9e0b1c062d\"}");
+
+
+        List<CallDTO> list = testGenerator.getCallsFromJsonList(jsonList);
+//        if (list == null)
+//            return null;
+
+        String result = testGenerator.generateTest(list);
+        String expected = "    @Test\n" +
+                "    public void createFreeTickets() throws Exception {\n" +
+                "\n" +
+                "        Long mock1 = 0L;\n" +
+                "\n" +
+                "\n" +
+                "        when(manager.create(any())).thenReturn(mock1);\n" +
+                "\n" +
+                "        String requestJson = \"{\\\"playerID\\\":453816,\\\"brandID\\\":1051,\\\"freeTicketsType\\\":\\\"STANDARD\\\",\\\"roomIDList\\\":[1262],\\\"freeTickets\\\":5,\\\"minCostTicket\\\":null,\\\"maxCostTicket\\\":null,\\\"bonusCode\\\":\\\"BC1592333087794\\\",\\\"expirationDate\\\":0}\";\n" +
+                "        CreateFreeTicketsRequest request = objectMapper.readValue(requestJson, CreateFreeTicketsRequest.class);\n" +
+                "\n" +
+                "        String resultJson = \"{\\\"status\\\":0,\\\"description\\\":\\\"OK.\\\",\\\"value\\\":{\\\"providerPlayerId\\\":453816,\\\"bonusCode\\\":\\\"BC1592333087794\\\"}}\";\n" +
+                "        BaseResponse result = objectMapper.readValue(resultJson, BaseResponse.class);\n" +
+                "\n" +
+                "        BaseResponse<CreateFreeTickersResponse> actualResult = controller.createFreeTickets(request);\n" +
+                "        String actualResultJson = objectMapper.writeValueAsString(actualResult);\n" +
                 "\n" +
                 "        assertEquals(resultJson, actualResultJson);\n" +
                 "    }\n";
