@@ -76,7 +76,7 @@ public class FrontController {
                     "        when(freeTicketsManager.activeFreeTickets(any())).thenReturn(var2);\n" +
                     "\n" +
                     "\n" +
-                    "        BaseResponse<ActiveFreeTicketsResponse> actualResult = controller.activeFreeTickets(var1);\n" +
+                    "        BaseResponse<> actualResult = controller.activeFreeTickets(var1);\n" +
                     "        String actualResultJson = objectMapper.writeValueAsString(actualResult);\n" +
                     "\n" +
                     "        assertEquals(resultJson, actualResultJson);\n" +

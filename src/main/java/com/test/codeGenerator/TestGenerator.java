@@ -171,7 +171,7 @@ public class TestGenerator {
 
         dd = dd.replace(" varr123asdf ", " request ");
         dd = dd.replace(".readValue(requestJson, ", ".readValue(requestJson, ");
-        dd = dd + "  ";
+//        dd = dd + "  ";
 
 
         test = test + dd +
@@ -179,16 +179,15 @@ public class TestGenerator {
 
                 "\n" + "";
 
-        dd = "        String responseJson = \"" + list.get(i).getResult().getJsonData().replace("\"", "\\\"") + "\";\n";
-        dd += "        " + list.get(i).getResult().getTestParameterDefinition();
+        if (list.get(i).getResult().getTestParameterDefinition() != null) {
+            dd = "        String responseJson = \"" + list.get(i).getResult().getJsonData().replace("\"", "\\\"") + "\";\n";
+            dd += "        " + list.get(i).getResult().getTestParameterDefinition();
+            dd = dd.replace(" varr123asdf ", " actualResponse ");
+            dd = dd.replace(".readValue(requestJson, ", ".readValue(responseJson, ");
+            dd = dd + "\n";
 
-        dd = dd.replace(" varr123asdf ", " actualResponse ");
-        dd = dd.replace(".readValue(requestJson, ", ".readValue(responseJson, ");
-        dd = dd + "\n";
-
-        test = test + dd +
-
-                "\n";
+            test = test + dd + "\n";
+        }
 
         dd = "        String resultJson = \"" + list.get(i + 1).getResult().getJsonData()
                 .replace("\"", "\\\"") + "\";\n";
@@ -200,8 +199,8 @@ public class TestGenerator {
 
         test = test + dd +
                 "\n" +
-                "        BaseResponse<ActiveFreeTicketsResponse> actualResult = controller.activeFreeTickets(request);\n" +
-                "        String actualResultJson = objectMapper.writeValueAsString(result);\n" +
+                "        BaseResponse<> actualResult = controller." + list.get(list.size() - 1).getMethodName() + "(request);\n" +
+                "        String actualResultJson = objectMapper.writeValueAsString(actualResult);\n" +
                 "\n" +
                 "        assertEquals(resultJson, actualResultJson);\n" +
                 "    }\n";

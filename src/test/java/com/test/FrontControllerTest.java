@@ -42,7 +42,7 @@ public class FrontControllerTest {
                 "        when(manager.activeFreeTickets(any())).thenReturn(mock1);\n" +
                 "\n" +
                 "        String requestJson = \"{\\\"playerID\\\":453816,\\\"roomID\\\":0}\";\n" +
-                "        ActiveFreeTicketsRequest request = objectMapper.readValue(requestJson, ActiveFreeTicketsRequest.class);  \n" +
+                "        ActiveFreeTicketsRequest request = objectMapper.readValue(requestJson, ActiveFreeTicketsRequest.class);\n" +
                 "\n" +
                 "        String responseJson = \"[{\\\"roomIDList\\\":\\\"1262\\\",\\\"bonusCode\\\":\\\"BC1587642892646\\\",\\\"expirationDate\\\":1594846799409,\\\"freeTicketsType\\\":\\\"STANDARD\\\",\\\"status\\\":\\\"Pending\\\",\\\"activeFreeTickets\\\":5,\\\"playedFreeTickets\\\":0,\\\"awardingDate\\\":1586768121885,\\\"minCostTicket\\\":0.0,\\\"maxCostTicket\\\":0.0}]\";\n" +
                 "        ArrayList<FreeRoundBonus> actualResponse = objectMapper.readValue(responseJson, ArrayList.class);\n" +
@@ -50,8 +50,8 @@ public class FrontControllerTest {
                 "        String resultJson = \"{\\\"status\\\":0,\\\"description\\\":\\\"OK.\\\",\\\"value\\\":{\\\"bonuses\\\":null}}\";\n" +
                 "        BaseResponse result = objectMapper.readValue(resultJson, BaseResponse.class);\n" +
                 "\n" +
-                "        BaseResponse<ActiveFreeTicketsResponse> actualResult = controller.activeFreeTickets(request);\n" +
-                "        String actualResultJson = objectMapper.writeValueAsString(result);\n" +
+                "        BaseResponse<> actualResult = controller.activeFreeTickets(request);\n" +
+                "        String actualResultJson = objectMapper.writeValueAsString(actualResult);\n" +
                 "\n" +
                 "        assertEquals(resultJson, actualResultJson);\n" +
                 "    }\n";
@@ -86,7 +86,7 @@ public class FrontControllerTest {
                 "        String resultJson = \"{\\\"status\\\":0,\\\"description\\\":\\\"OK.\\\",\\\"value\\\":{\\\"providerPlayerId\\\":453816,\\\"bonusCode\\\":\\\"BC1592333087794\\\"}}\";\n" +
                 "        BaseResponse result = objectMapper.readValue(resultJson, BaseResponse.class);\n" +
                 "\n" +
-                "        BaseResponse<CreateFreeTickersResponse> actualResult = controller.createFreeTickets(request);\n" +
+                "        BaseResponse<> actualResult = controller.createFreeTickets(request);\n" +
                 "        String actualResultJson = objectMapper.writeValueAsString(actualResult);\n" +
                 "\n" +
                 "        assertEquals(resultJson, actualResultJson);\n" +
