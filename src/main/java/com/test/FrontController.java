@@ -95,7 +95,7 @@ public class FrontController {
 
         callsDAOJdbc.save(data);
 
-        getPage(1);
+//        getPage(1);
     }
 
 }
