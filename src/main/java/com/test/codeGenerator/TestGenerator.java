@@ -109,28 +109,12 @@ public class TestGenerator {
         for (int i = 0; i < list.size()-1; i++) {
             callData = list.get(i);
             if (callData.getParams() != null) {
-
-                boolean coma = false;
-
-//            for (ParameterDTO param : callData.getParams()) {
-
                 test += formatReqResp(list, i, "mock" + (i + 1), false);
-                test += formatResponse(list, i, "mock" + (i + 1), false);
-//                test += "\n" +
-//                        "        when(freeTicketsManager." + callData.getMethodName() + "(any())).thenReturn(" + "mock" + (i + 1) + ");\n\n";
-
-                for (ParameterDTO param : callData.getParams()) {
-
-                    call += coma ? ", " + formatParameter(param) : formatParameter(param);
-                    coma = true;
-                }
-                resultStr = formatParameter(callData.getResult());
-
             }
         }
 
-//        test += formatReqResp(list,list.size() - 1, "request", true);
-//
+        int i = list.size()-2;
+        test += formatResponse(list, i, "mock" + (i + 1), false);
 
         return test;
     }
