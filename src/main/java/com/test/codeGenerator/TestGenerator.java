@@ -109,24 +109,24 @@ public class TestGenerator {
         for (int i = 0; i < list.size()-1; i++) {
             callData = list.get(i);
             if (callData.getParams() != null) {
-                test += formatReqResp(list, i, "mock" + (i + 1), false);
+                test += formatReqResp(list.get(i), i);
             }
         }
 
         int i = list.size()-2;
-        test += formatResponse(list, i, "mock" + (i + 1), false);
+        test += formatResponse(list, i);
 
         return test;
     }
 
-    private String formatReqResp(List<CallDTO> list, int index, String varName, boolean isResult) {
+    private String formatReqResp(CallDTO element, int index) {
 
-
+        String varName = "mock" + (index + 1);
         String mocksDefinition = "";
-        int i = index;
+
             String def = "";
-            String dd = "        String " + varName + "Json = \"" + list.get(i).getResult().getJsonData().replace("\"", "\\\"") + "\";\n";
-            ParameterDTO result = list.get(i).getResult();
+            String dd = "        String " + varName + "Json = \"" + element.getResult().getJsonData().replace("\"", "\\\"") + "\";\n";
+            ParameterDTO result = element.getResult();
 
             if (result.isClassPrimitive()) {
                 dd = "";
@@ -149,11 +149,11 @@ public class TestGenerator {
 
             int j = 0;
             String paramList = "";
-            for (ParameterDTO param : list.get(i + 0).getParams()) {
+            for (ParameterDTO param : element.getParams()) {
                 String paramName = "";
                 if (param.isClassPrimitive()) {
                     if (param.getClassName() != null) {
-                        paramName = "param" + (i + 1) + "_" + (j + 1);
+                        paramName = "param" + (index + 1) + "_" + (j + 1);
 
                         String paramType = getSimpleClassName(param.getClassName(), false);
                         paramDefinitionlist += getStringSwitch(paramName, paramType, param);
@@ -173,20 +173,32 @@ public class TestGenerator {
                 }
                 j++;
             }
+
+            String beanname = getInjectBeanName(element.getClassName(), false);
             String test = dd +
                     "\n" +
                     "\n" + paramDefinitionlist + "\n" +
-                    "        when(manager." + list.get(i).getMethodName() + "(" + paramList + ")).thenReturn(" + "mock" + (i + 1) + ");\n" +
+                    "        when(" + beanname + "." + element.getMethodName() + "(" + paramList + ")).thenReturn(" + "mock" + (index + 1) + ");\n" +
                     "\n" + "";
             mocksDefinition += test;
 
 
+        return mocksDefinition;
+    }
+
+    private String getInjectBeanName(String className, boolean b) {
+        String res = getSimpleClassName(className, b);
+        res = res.substring(0, 1).toLowerCase() + res.substring(1);
+        res = res.replace("Impl", "");
+        return res;
+    }
+
+    private String formatResponse(List<CallDTO> list, int index) {
+        String dd = "";
         String g = "";
-        dd = "";
-        i = list.size() - 1;
+        int i = index;
         for(ParameterDTO param: list.get(i).getParams()) {
             if (param.isClassPrimitive()) {
-                g = param.getTestParameterDefinition();
             } else {
                 dd = "        String requestJson = \"" + list.get(i).getParams().get(0).getJsonData()
                         .replace("\"", "\\\"") + "\";\n";
@@ -201,17 +213,13 @@ public class TestGenerator {
 //        dd = dd + "  ";
 
 
-        mocksDefinition = mocksDefinition + dd +
+        String test = dd +
                 "\n" +
 
                 "\n" + "";
-        return mocksDefinition;
-    }
 
-    private String formatResponse(List<CallDTO> list, int index, String varName, boolean isResult) {
-        String test = "";
-        String dd = "";
-        int i = index;
+        dd = "";
+        i = index;
         if (list.get(i).getResult().getTestParameterDefinition() != null) {
             dd = "        String responseJson = \"" + list.get(i).getResult().getJsonData().replace("\"", "\\\"") + "\";\n";
             dd += "        " + list.get(i).getResult().getTestParameterDefinition();
