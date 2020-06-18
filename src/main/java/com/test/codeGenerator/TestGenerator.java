@@ -190,6 +190,7 @@ public class TestGenerator {
         String res = getSimpleClassName(className, b);
         res = res.substring(0, 1).toLowerCase() + res.substring(1);
         res = res.replace("Impl", "");
+        res = res.replace("DaoJdbc", "Dao");
         return res;
     }
 
@@ -252,9 +253,17 @@ public class TestGenerator {
 
     private String getStringSwitch(String paramName, String paramType, ParameterDTO param) {
         String paramDefinitionlist = "";
-        switch (paramType){
+        switch (paramType) {
             case "String": {
                 paramDefinitionlist += "        " + paramType + " " + paramName + " = " + param.getJsonData();
+                break;
+            }
+            case "Long": {
+                paramDefinitionlist += "        " + paramType + " " + paramName + " = " + param.getJsonData() + "L";
+                break;
+            }
+            case "Double": {
+                paramDefinitionlist += "        " + paramType + " " + paramName + " = " + param.getJsonData() + "D";
                 break;
             }
 

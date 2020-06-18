@@ -39,7 +39,7 @@ public class FrontControllerTest {
                 "        ArrayList<FreeRoundBonus> mock1 = objectMapper.readValue(mock1Json, ArrayList.class);\n" +
                 "\n" +
                 "\n" +
-                "        when(manager.activeFreeTickets(any())).thenReturn(mock1);\n" +
+                "        when(integrationFreeTicketsManager.activeFreeTickets(any())).thenReturn(mock1);\n" +
                 "\n" +
                 "        String requestJson = \"{\\\"playerID\\\":453816,\\\"roomID\\\":0}\";\n" +
                 "        ActiveFreeTicketsRequest request = objectMapper.readValue(requestJson, ActiveFreeTicketsRequest.class);\n" +
@@ -78,7 +78,7 @@ public class FrontControllerTest {
                 "        Long mock1 = 0L;\n" +
                 "\n" +
                 "\n" +
-                "        when(manager.create(any())).thenReturn(mock1);\n" +
+                "        when(integrationFreeTicketsManager.create(any())).thenReturn(mock1);\n" +
                 "\n" +
                 "        String requestJson = \"{\\\"playerID\\\":453816,\\\"brandID\\\":1051,\\\"freeTicketsType\\\":\\\"STANDARD\\\",\\\"roomIDList\\\":[1262],\\\"freeTickets\\\":5,\\\"minCostTicket\\\":null,\\\"maxCostTicket\\\":null,\\\"bonusCode\\\":\\\"BC1592333087794\\\",\\\"expirationDate\\\":0}\";\n" +
                 "        CreateFreeTicketsRequest request = objectMapper.readValue(requestJson, CreateFreeTicketsRequest.class);\n" +
@@ -179,7 +179,8 @@ public class FrontControllerTest {
         String result = testGenerator.generateTest(list);
         StringBuilder expected = new StringBuilder();
         expected.append("    @Test\n")
-                .append("    public void createFreeTickets() throws Exception {\n" +
+                .append("    public void getAvailableGames() throws Exception {\n" +
+        "\n" +
         "        Integer mock1 = 15;\n" +
         "\n" +
         "        String param1_1 = \"BINGO.PURCHASE_STOP_PERIOD\";\n" +
